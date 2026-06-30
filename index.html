@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datadog Monitoring - Dashboard</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+  body { display: flex; background: #f4f6fb; min-height: 100vh; overflow-x: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 185px;
+    min-height: 100vh;
+    background: #0f0729;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 200;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 18px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    text-decoration: none;
+  }
+
+  .sidebar-logo img {
+    width: 30px; height: 30px;
+    border-radius: 6px;
+  }
+
+  .sidebar-logo span {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .sidebar-logo .logo-icon {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px;
+  }
+
+  .sidebar nav {
+    flex: 1;
+    padding: 14px 0;
+  }
+
+  .sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 18px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+
+  .sidebar nav a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .sidebar nav a.active {
+    color: #fff;
+    background: rgba(109,40,217,0.25);
+    border-left-color: #7c3aed;
+  }
+
+  .sidebar nav a i {
+    width: 16px;
+    font-size: 13px;
+  }
+
+  .sidebar-status {
+    margin: 0 12px 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .sidebar-status .status-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .dot-green { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+  .status-row { display: flex; align-items: center; margin-bottom: 4px; }
+
+  .sidebar-status .label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 7px; margin-bottom: 2px; }
+
+  .sidebar-status .value { font-size: 11.5px; color: rgba(255,255,255,0.75); }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 185px; right: 0;
+    height: 56px;
+    background: #fff;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .topbar-left h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e1b4b;
+  }
+
+  .topbar-left p {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 1px;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f4f6fb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #9ca3af;
+    width: 200px;
+  }
+
+  .topbar-icon {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: #f4f6fb;
+    display: flex; align-items: center; justify-content: center;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .badge {
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 8px; height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 1.5px solid #fff;
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+  }
+
+  .user-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 600;
+  }
+
+  .user-name { font-size: 13px; font-weight: 600; color: #374151; }
+  .user-role { font-size: 11px; color: #9ca3af; }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 185px;
+    margin-top: 56px;
+    padding: 28px;
+    flex: 1;
+  }
+
+  /* ── STAT CARDS ROW ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 22px;
+    border: 1px solid #f0f0f8;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .stat-label { font-size: 12px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .stat-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .stat-value { font-size: 28px; font-weight: 700; color: #1e1b4b; line-height: 1; }
+
+  .stat-sub {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+  }
+
+  .stat-trend {
+    font-size: 12px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+  }
+
+  .trend-up { color: #22c55e; }
+  .trend-down { color: #ef4444; }
+
+  /* mini sparkline */
+  .sparkline { margin-top: 10px; height: 36px; }
+
+  /* ── CHARTS ROW ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 22px;
+    border: 1px solid #f0f0f8;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e1b4b;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title .view-all {
+    font-size: 12px;
+    color: #7c3aed;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .chart-container { position: relative; }
+
+  /* ── MODULES GRID ── */
+  .modules-section { margin-bottom: 24px; }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e1b4b;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .module-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #f0f0f8;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: all 0.25s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(109,40,217,0.12);
+    border-color: #ddd6fe;
+  }
+
+  .module-thumb {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+
+  .module-body {
+    padding: 16px 18px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .module-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6d28d9;
+  }
+
+  .module-desc {
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.5;
+  }
+
+  .module-link {
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: #7c3aed;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* ── BOTTOM ROW ── */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  /* Alerts table */
+  .alerts-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .alerts-table th { text-align: left; font-size: 11px; font-weight: 600; color: #9ca3af; padding: 0 0 8px; border-bottom: 1px solid #f0f0f8; text-transform: uppercase; }
+  .alerts-table td { padding: 10px 0; border-bottom: 1px solid #f9f9fb; color: #374151; }
+  .alerts-table tr:last-child td { border-bottom: none; }
+
+  .badge-pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-critical { background: #fef2f2; color: #ef4444; }
+  .badge-warning  { background: #fffbeb; color: #f59e0b; }
+  .badge-open     { background: #eff6ff; color: #3b82f6; }
+  .badge-resolved { background: #f0fdf4; color: #22c55e; }
+
+  /* System Health */
+  .health-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 8px;
+  }
+
+  .health-circle {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: #f0fdf4;
+    border: 3px solid #22c55e;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    color: #22c55e;
+    margin-bottom: 4px;
+  }
+
+  .health-text { font-size: 15px; font-weight: 700; color: #16a34a; }
+  .health-sub  { font-size: 12px; color: #9ca3af; text-align: center; }
+
+  /* Donut legend */
+  .donut-legend { margin-top: 14px; }
+  .legend-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 12.5px; color: #374151; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; display: inline-block; }
+
+  /* Logout btn */
+  .btn-logout {
+    display: flex; align-items: center; gap: 7px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 7px;
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 0 12px 18px;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .modules-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<script>
+  if (!sessionStorage.getItem('loggedIn')) window.location.href = 'login.html';
+</script>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <a class="sidebar-logo" href="index.html">
+    <div class="logo-icon"><i class="fa-solid fa-database"></i></div>
+    <span>DATADOG</span>
+  </a>
+
+  <nav>
+    <a href="index.html" class="active"><i class="fa-solid fa-gauge-high"></i> Overview</a>
+    <a href="datadog-integration/index.html"><i class="fa-solid fa-plug"></i> Datadog Integration</a>
+    <a href="metrics/index.html"><i class="fa-solid fa-chart-line"></i> Metrics</a>
+    <a href="apm/index.html"><i class="fa-solid fa-layer-group"></i> APM</a>
+    <a href="infrastructure/index.html"><i class="fa-solid fa-server"></i> Infrastructure</a>
+    <a href="log-analytics/index.html"><i class="fa-solid fa-file-lines"></i> Logs</a>
+    <a href="realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i> Real-Time Dashboard</a>
+    <a href="alert-management/index.html"><i class="fa-solid fa-bell"></i> Alerts</a>
+    <a href="monitors/index.html"><i class="fa-solid fa-display"></i> Monitors</a>
+    <a href="dashboards/index.html"><i class="fa-solid fa-table-columns"></i> Dashboards</a>
+    <a href="integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i> Integrations</a>
+    <a href="reports/index.html"><i class="fa-solid fa-chart-bar"></i> Reports</a>
+    <a href="ai-observability/index.html"><i class="fa-solid fa-robot"></i> AI Observability</a>
+    <a href="settings/index.html"><i class="fa-solid fa-gear"></i> Settings</a>
+  </nav>
+
+  <div class="sidebar-status">
+    <div class="status-title">Datadog Status</div>
+    <div class="status-row"><span class="dot-green"></span><span style="color:#22c55e;font-size:12px;font-weight:600;">All Systems Operational</span></div>
+    <div class="label">Site</div>
+    <div class="value">datadoghq.com</div>
+    <div class="label">API Key</div>
+    <div class="value">dd_api_••••••••••</div>
+    <div class="label">Last Updated</div>
+    <div class="value">30 sec ago</div>
+  </div>
+
+  <a class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</aside>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h2>Dashboard</h2>
+    <p>Welcome <strong id="welcomeUser">Admin</strong> 👋</p>
+  </div>
+  <div class="topbar-right">
+    <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i> Search metrics, logs…</div>
+    <div class="topbar-icon"><i class="fa-solid fa-bell"></i><span class="badge"></span></div>
+    <div class="user-chip">
+      <div class="user-avatar" id="avatarEl">A</div>
+      <div>
+        <div class="user-name" id="userNameEl">Admin User</div>
+        <div class="user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-label">Servers</div>
+        <div class="stat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-server"></i></div>
+      </div>
+      <div class="stat-value">24</div>
+      <div class="stat-sub">All Systems</div>
+      <div class="stat-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 1 vs yesterday</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-label">CPU Usage</div>
+        <div class="stat-icon" style="background:#fef3c7;color:#f59e0b;"><i class="fa-solid fa-microchip"></i></div>
+      </div>
+      <div class="stat-value">58%</div>
+      <div class="stat-sub">Average</div>
+      <div class="stat-trend trend-down"><i class="fa-solid fa-arrow-down"></i> 5.2% vs last hour</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-label">Memory Usage</div>
+        <div class="stat-icon" style="background:#dbeafe;color:#3b82f6;"><i class="fa-solid fa-memory"></i></div>
+      </div>
+      <div class="stat-value">62%</div>
+      <div class="stat-sub">Average</div>
+      <div class="stat-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 3.1% vs last hour</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-label">Active Alerts</div>
+        <div class="stat-icon" style="background:#fef2f2;color:#ef4444;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      </div>
+      <div class="stat-value" style="color:#ef4444;">7</div>
+      <div class="stat-sub">Critical</div>
+      <div class="stat-trend trend-up" style="color:#ef4444;"><i class="fa-solid fa-arrow-up"></i> 2 new alerts</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">CPU Usage Over Time <span class="view-all">View All →</span></div>
+      <div class="chart-container" style="height:200px;">
+        <canvas id="cpuChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top Services</div>
+      <div class="chart-container" style="height:140px;">
+        <canvas id="donutChart"></canvas>
+      </div>
+      <div class="donut-legend">
+        <div class="legend-row"><span><span class="legend-dot" style="background:#7c3aed;"></span>Web Server</span><span>35%</span></div>
+        <div class="legend-row"><span><span class="legend-dot" style="background:#3b82f6;"></span>Database</span><span>25%</span></div>
+        <div class="legend-row"><span><span class="legend-dot" style="background:#f59e0b;"></span>API Service</span><span>20%</span></div>
+        <div class="legend-row"><span><span class="legend-dot" style="background:#22c55e;"></span>Cache</span><span>10%</span></div>
+        <div class="legend-row"><span><span class="legend-dot" style="background:#e5e7eb;"></span>Others</span><span>10%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE CARDS -->
+  <div class="modules-section">
+    <div class="section-title"><i class="fa-solid fa-grid-2" style="color:#7c3aed;"></i> Monitoring Modules</div>
+    <div class="modules-grid">
+
+      <a class="module-card" href="datadog-integration/index.html">
+        <img class="module-thumb" src="images/datadog-integration.jpg" alt="Datadog Integration">
+        <div class="module-body">
+          <div class="module-title">Datadog Integration</div>
+          <div class="module-desc">API integration, metrics collection, APM &amp; log monitoring</div>
+          <div class="module-link">Open module <i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+      </a>
+
+      <a class="module-card" href="alert-management/index.html">
+        <img class="module-thumb" src="images/alert-management.jpg" alt="Alert Management">
+        <div class="module-body">
+          <div class="module-title">Alert Management</div>
+          <div class="module-desc">Manage alerts, notifications &amp; critical incidents</div>
+          <div class="module-link">Open module <i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+      </a>
+
+      <a class="module-card" href="ai-observability/index.html">
+        <img class="module-thumb" src="images/ai-observability.jpg" alt="AI Observability">
+        <div class="module-body">
+          <div class="module-title">AI Observability</div>
+          <div class="module-desc">Anomaly detection &amp; predictive failure analysis</div>
+          <div class="module-link">Open module <i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+      </a>
+
+      <a class="module-card" href="log-analytics/index.html">
+        <img class="module-thumb" src="images/log-analytics.jpg" alt="Log Analytics">
+        <div class="module-body">
+          <div class="module-title">Log Analytics</div>
+          <div class="module-desc">Centralized log collection &amp; AI-based insights</div>
+          <div class="module-link">Open module <i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+      </a>
+
+      <a class="module-card" href="reports/index.html">
+        <img class="module-thumb" src="images/reports.jpg" alt="Reports">
+        <div class="module-body">
+          <div class="module-title">Reports</div>
+          <div class="module-desc">Daily / weekly / monthly monitoring reports &amp; exports</div>
+          <div class="module-link">Open module <i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+      </a>
+
+      <a class="module-card" href="realtime-monitoring/index.html">
+        <img class="module-thumb" src="images/realtime-monitoring.jpg" alt="Real-Time Monitoring">
+        <div class="module-body">
+          <div class="module-title">Real-Time Monitoring</div>
+          <div class="module-desc">Live CPU, memory, disk &amp; network charts</div>
+          <div class="module-link">Open module <i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+    <div class="card">
+      <div class="card-title">Recent Alerts <span class="view-all">View All →</span></div>
+      <table class="alerts-table">
+        <thead>
+          <tr>
+            <th>Alert</th>
+            <th>Severity</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>High CPU Usage on Server-1</td>
+            <td><span class="badge-pill badge-critical">Critical</span></td>
+            <td>2 mins ago</td>
+            <td><span class="badge-pill badge-open">Open</span></td>
+          </tr>
+          <tr>
+            <td>Disk Space Low on Server-3</td>
+            <td><span class="badge-pill badge-warning">Warning</span></td>
+            <td>10 mins ago</td>
+            <td><span class="badge-pill badge-open">Open</span></td>
+          </tr>
+          <tr>
+            <td>Memory Usage High on Server-5</td>
+            <td><span class="badge-pill badge-critical">Critical</span></td>
+            <td>15 mins ago</td>
+            <td><span class="badge-pill badge-open">Open</span></td>
+          </tr>
+          <tr>
+            <td>SSL Certificate Expiring Soon</td>
+            <td><span class="badge-pill" style="background:#f0fdf4;color:#22c55e;">Info</span></td>
+            <td>1 hr ago</td>
+            <td><span class="badge-pill badge-resolved">Resolved</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">System Health</div>
+      <div class="health-box">
+        <div class="health-circle"><i class="fa-solid fa-check"></i></div>
+        <div class="health-text">All Systems Operational</div>
+        <div class="health-sub">Everything is running smoothly<br>Last checked: just now</div>
+        <div style="margin-top:16px;width:100%;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#9ca3af;margin-bottom:5px;"><span>Uptime</span><span style="color:#22c55e;font-weight:600;">99.98%</span></div>
+          <div style="height:6px;background:#f0f0f8;border-radius:4px;"><div style="height:100%;width:99.98%;background:#22c55e;border-radius:4px;"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#9ca3af;margin-top:10px;margin-bottom:5px;"><span>Response Time</span><span style="color:#7c3aed;font-weight:600;">245ms</span></div>
+          <div style="height:6px;background:#f0f0f8;border-radius:4px;"><div style="height:100%;width:60%;background:#7c3aed;border-radius:4px;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Auth
+  const user = sessionStorage.getItem('user') || 'admin';
+  document.getElementById('userNameEl').textContent = user.charAt(0).toUpperCase() + user.slice(1) + ' User';
+  document.getElementById('welcomeUser').textContent = user.charAt(0).toUpperCase() + user.slice(1);
+  document.getElementById('avatarEl').textContent = user.charAt(0).toUpperCase();
+
+  function logout() {
+    sessionStorage.removeItem('loggedIn');
+    sessionStorage.removeItem('user');
+    window.location.href = 'login.html';
+  }
+
+  // CPU Chart
+  const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+  const labels = ['00:00','04:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00'];
+  const cpuData = [38,45,52,60,58,65,55,62,58];
+
+  new Chart(cpuCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'CPU Usage (%)',
+        data: cpuData,
+        borderColor: '#7c3aed',
+        backgroundColor: 'rgba(124,58,237,0.08)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#7c3aed'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9ca3af' } },
+        y: {
+          min: 0, max: 100,
+          ticks: { font: { size: 11 }, color: '#9ca3af', callback: v => v + '%' },
+          grid: { color: '#f4f4f8' }
+        }
+      }
+    }
+  });
+
+  // Donut Chart
+  const donutCtx = document.getElementById('donutChart').getContext('2d');
+  new Chart(donutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Web Server','Database','API Service','Cache','Others'],
+      datasets: [{
+        data: [35,25,20,10,10],
+        backgroundColor: ['#7c3aed','#3b82f6','#f59e0b','#22c55e','#e5e7eb'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` } } }
+    }
+  });
+</script>
+</body>
+</html>
