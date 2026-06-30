@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datadog Integration</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../shared-dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.int-status-bar{background:#fff;border:1px solid #d1fae5;border-radius:10px;padding:16px 22px;margin:0 30px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 1px 5px rgba(17,12,46,.04);}
+.int-status-icon{width:34px;height:34px;border-radius:50%;background:#22c55e;color:#fff;display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+.int-status-text h4{font-size:14px;font-weight:700;color:#161225;}
+.int-status-text p{font-size:12px;color:#9590a8;margin-top:2px;}
+.int-status-meta{display:flex;gap:28px;align-items:center;flex-wrap:wrap;}
+.int-meta-item span{display:block;font-size:11px;color:#9590a8;}
+.int-meta-item strong{font-size:13px;color:#161225;}
+.int-meta-item .live{color:#22c55e;font-weight:700;}
+.sync-btn{border:1px solid #e5e7eb;background:#fff;border-radius:9px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;color:#3a3648;transition:background .2s;}
+.sync-btn:hover{background:#f5f6fb;}
+/* Metric mini-cards */
+.metrics-section{padding:0 30px 18px;}
+.metrics-section h2{font-size:11px;font-weight:700;text-transform:uppercase;color:#9590a8;letter-spacing:.5px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.metrics-section h2 select{font-size:11px;border:1px solid #e5e7eb;border-radius:7px;padding:3px 8px;background:#fff;color:#3a3648;font-weight:400;}
+.mini-metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+.mini-metric{background:#fff;border:1px solid #ebeaf3;border-radius:10px;padding:14px;box-shadow:0 1px 5px rgba(17,12,46,.04);}
+.mini-metric p.label{font-size:11px;color:#9590a8;margin-bottom:4px;}
+.mini-metric p.value{font-size:17px;font-weight:800;color:#120f22;}
+.mini-metric p.value span{font-size:10px;font-weight:400;color:#9590a8;}
+.mini-metric .chart-wrap{height:32px;margin:6px 0;}
+.mini-metric .trend{font-size:10px;margin-top:4px;}
+.trend.up{color:#ef4444;}
+.trend.down{color:#22c55e;}
+/* Three column section */
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:0 30px 18px;}
+.int-panel{background:#fff;border:1px solid #ebeaf3;border-radius:10px;padding:18px;box-shadow:0 1px 5px rgba(17,12,46,.04);display:flex;flex-direction:column;}
+.int-panel h3{font-size:11px;font-weight:700;text-transform:uppercase;color:#9590a8;letter-spacing:.4px;margin-bottom:14px;}
+.mini-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
+.mini-stat{background:#f8f7fc;border-radius:8px;padding:8px 6px;text-align:center;}
+.mini-stat p.ms-label{font-size:10px;color:#9590a8;margin-bottom:3px;}
+.mini-stat p.ms-val{font-size:13px;font-weight:800;}
+.mini-stat p.ms-val.blue{color:#2563eb;}
+.mini-stat p.ms-val.red{color:#dc2626;}
+.mini-stat p.ms-val.purple{color:#7c3aed;}
+.mini-stat p.ms-val.green{color:#16a34a;}
+/* APM table */
+.apm-table{width:100%;border-collapse:collapse;font-size:11px;}
+.apm-table th{font-size:10px;text-transform:uppercase;color:#9590a8;text-align:left;padding:5px 4px;border-bottom:1px solid #ebeaf3;}
+.apm-table td{padding:7px 4px;border-bottom:1px solid #f3f3f8;color:#3a3648;}
+/* Infra map */
+.infra-map{background:#f8f7fc;border-radius:10px;padding:14px;text-align:center;margin-bottom:14px;}
+.infra-map p.map-title{font-size:10px;font-weight:700;text-transform:uppercase;color:#9590a8;margin-bottom:10px;}
+.infra-box{display:inline-block;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;}
+.infra-box small{display:block;font-size:9px;font-weight:400;margin-top:1px;}
+.ib-purple{background:#ede9fe;color:#6d28d9;border:1px solid #ddd6fe;}
+.ib-blue{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;}
+.ib-green{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;}
+.ib-amber{background:#fef3c7;color:#b45309;border:1px solid #fde68a;}
+.ib-cyan{background:#cffafe;color:#0e7490;border:1px solid #a5f3fc;}
+.ib-rose{background:#ffe4e6;color:#be123c;border:1px solid #fecdd3;}
+.infra-row{display:flex;justify-content:center;gap:8px;margin-top:8px;}
+.infra-count-row{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid #ebeaf3;}
+.infra-count-row .lbl{font-size:10px;color:#9590a8;}
+.infra-count-row .val{font-size:15px;font-weight:800;color:#120f22;}
+.infra-count-row .sub{font-size:9px;}
+.sub.green{color:#16a34a;}
+.sub.blue{color:#2563eb;}
+/* Log stream */
+.log-entry{display:flex;align-items:center;gap:8px;font-size:11px;border-bottom:1px solid #f3f3f8;padding:7px 0;}
+.log-time{font-family:monospace;color:#9590a8;flex-shrink:0;width:58px;}
+.log-svc{color:#3a3648;font-weight:600;width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.log-badge{padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;flex-shrink:0;}
+.badge-error{background:#fee2e2;color:#dc2626;}
+.badge-warn{background:#fef3c7;color:#b45309;}
+.badge-info{background:#dbeafe;color:#1d4ed8;}
+.log-msg{color:#9590a8;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.log-scroll{max-height:130px;overflow-y:auto;}
+.panel-link-btn{width:100%;text-align:center;font-size:12px;font-weight:700;color:#7c3aed;border:1px solid #ebeaf3;border-radius:8px;padding:7px;background:#fff;cursor:pointer;margin-top:auto;padding-top:10px;text-decoration:none;display:block;transition:background .15s;}
+.panel-link-btn:hover{background:#f5f3ff;}
+/* API details bar */
+.api-details{background:#fff;border:1px solid #ebeaf3;border-radius:10px;padding:18px 22px;margin:0 30px 24px;box-shadow:0 1px 5px rgba(17,12,46,.04);}
+.api-details h3{font-size:11px;font-weight:700;text-transform:uppercase;color:#9590a8;margin-bottom:14px;}
+.api-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px;}
+.api-item span{display:block;font-size:11px;color:#9590a8;margin-bottom:3px;}
+.api-item strong{font-size:12px;color:#161225;word-break:break-all;}
+.api-item strong.success{color:#16a34a;}
+.api-actions{display:flex;gap:10px;}
+.api-btn{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e5e7eb;background:#fff;color:#3a3648;transition:background .2s;}
+.api-btn:hover{background:#f5f6fb;}
+.api-btn.danger{border-color:#fecaca;color:#dc2626;}
+.api-btn.danger:hover{background:#fff1f2;}
+@media(max-width:1200px){.mini-metrics{grid-template-columns:repeat(3,1fr)}.three-col{grid-template-columns:1fr 1fr}.api-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.mini-metrics{grid-template-columns:repeat(2,1fr)}.three-col{grid-template-columns:1fr}.api-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a class="active" href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>Connected</div>
+    <p style="font-size:11px;margin-top:8px;color:rgba(255,255,255,.5);">API Key</p>
+    <div style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 10px;font-size:12px;color:rgba(255,255,255,.7);display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+      <span>dd_api_**********</span><i class="fa-solid fa-eye" style="font-size:11px;opacity:.5;"></i>
+    </div>
+    <p style="font-size:11px;margin-top:8px;color:rgba(255,255,255,.5);">Site</p>
+    <select style="width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 10px;font-size:12px;color:rgba(255,255,255,.75);margin-top:3px;outline:none;">
+      <option>datadoghq.com</option>
+      <option>datadoghq.eu</option>
+    </select>
+    <p style="font-size:10px;color:rgba(255,255,255,.35);margin-top:8px;">Last Sync: <span style="color:rgba(255,255,255,.6);">2 mins ago</span></p>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div>
+      <h1>Datadog Integration</h1>
+      <p>API Integration · Metrics · APM · Infrastructure · Log Monitoring</p>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn"><i class="fa-solid fa-bell"></i></button>
+      <div class="avatar" data-user-avatar>A</div>
+    </div>
+  </header>
+
+  <!-- Status Bar -->
+  <div class="int-status-bar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="int-status-icon"><i class="fa-solid fa-check"></i></div>
+      <div class="int-status-text">
+        <h4>Datadog Integration Status</h4>
+        <p>Successfully connected to Datadog. All systems are receiving data.</p>
+      </div>
+    </div>
+    <div class="int-status-meta">
+      <div class="int-meta-item"><span>Data Sync Status</span><strong class="live">● Live</strong></div>
+      <div class="int-meta-item"><span>Last Updated</span><strong id="last-updated">—</strong></div>
+      <button class="sync-btn" onclick="fetchMetrics()"><i class="fa-solid fa-rotate"></i> Sync Now</button>
+    </div>
+  </div>
+
+  <!-- Metrics Collection -->
+  <section class="metrics-section">
+    <h2>Metrics Collection <select><option>Past 1 Hour</option><option>Past 6 Hours</option><option>Past 24 Hours</option></select></h2>
+    <div class="mini-metrics">
+      <div class="mini-metric">
+        <p class="label">CPU Usage</p>
+        <p class="value" id="cpu-txt">42.6% <span>Avg</span></p>
+        <div class="chart-wrap"><canvas id="cpuChart"></canvas></div>
+        <p class="trend down">↓ 5.2% vs last hour</p>
+      </div>
+      <div class="mini-metric">
+        <p class="label">Memory Usage</p>
+        <p class="value" id="mem-txt">68.3% <span>Avg</span></p>
+        <div class="chart-wrap"><canvas id="memChart"></canvas></div>
+        <p class="trend up">↑ 3.1% vs last hour</p>
+      </div>
+      <div class="mini-metric">
+        <p class="label">Disk Usage</p>
+        <p class="value">72.8% <span>Avg</span></p>
+        <div class="chart-wrap"><canvas id="diskChart"></canvas></div>
+        <p class="trend down">↓ 1.4% vs last hour</p>
+      </div>
+      <div class="mini-metric">
+        <p class="label">Network In</p>
+        <p class="value">125.6 <span>Mbps Avg</span></p>
+        <div class="chart-wrap"><canvas id="netInChart"></canvas></div>
+        <p class="trend up">↑ 8.7% vs last hour</p>
+      </div>
+      <div class="mini-metric">
+        <p class="label">Network Out</p>
+        <p class="value">98.4 <span>Mbps Avg</span></p>
+        <div class="chart-wrap"><canvas id="netOutChart"></canvas></div>
+        <p class="trend up">↑ 6.3% vs last hour</p>
+      </div>
+      <div class="mini-metric">
+        <p class="label">Active Hosts</p>
+        <p class="value">24 <span>Up</span></p>
+        <div style="height:32px;display:flex;align-items:center;justify-content:center;gap:4px;margin:6px 0;">
+          <i class="fa-solid fa-server" style="color:#7c3aed;font-size:18px;"></i>
+          <i class="fa-solid fa-server" style="color:#7c3aed;font-size:18px;"></i>
+        </div>
+        <p class="trend down">↑ 1 vs yesterday</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Three Panel Row -->
+  <div class="three-col">
+
+    <!-- APM -->
+    <div class="int-panel">
+      <h3>Application Performance Monitoring (APM)</h3>
+      <div class="mini-stats-grid">
+        <div class="mini-stat"><p class="ms-label">Requests</p><p class="ms-val blue">12.4K</p></div>
+        <div class="mini-stat"><p class="ms-label">Error Rate</p><p class="ms-val red">0.21%</p></div>
+        <div class="mini-stat"><p class="ms-label">Latency p95</p><p class="ms-val purple">245 ms</p></div>
+        <div class="mini-stat"><p class="ms-label">Throughput</p><p class="ms-val green">8.7K</p></div>
+      </div>
+      <p style="font-size:12px;font-weight:700;color:#3a3648;margin-bottom:8px;">Top Services</p>
+      <table class="apm-table">
+        <thead><tr><th>Service</th><th>Requests</th><th>Error</th><th>Latency</th></tr></thead>
+        <tbody>
+          <tr><td>user-service</td><td>3.2K/s</td><td>0.15%</td><td>120 ms</td></tr>
+          <tr><td>order-service</td><td>2.9K/s</td><td>0.23%</td><td>210 ms</td></tr>
+          <tr><td>payment-service</td><td>2.1K/s</td><td><span style="color:#dc2626;font-weight:700;">0.31%</span></td><td>350 ms</td></tr>
+          <tr><td>inventory-service</td><td>1.8K/s</td><td>0.18%</td><td>180 ms</td></tr>
+          <tr><td>notification-svc</td><td>0.9K/s</td><td>0.12%</td><td>95 ms</td></tr>
+        </tbody>
+      </table>
+      <a href="../apm/index.html" class="panel-link-btn">View APM Dashboard →</a>
+    </div>
+
+    <!-- Infrastructure -->
+    <div class="int-panel">
+      <h3>Infrastructure Monitoring</h3>
+      <div class="infra-map">
+        <p class="map-title">Infrastructure Map</p>
+        <div><span class="infra-box ib-purple">Load Balancer<small>1 Instance</small></span></div>
+        <div class="infra-row">
+          <span class="infra-box ib-blue">Web Servers<small>5 Instances</small></span>
+          <span class="infra-box ib-green">App Servers<small>4 Instances</small></span>
+        </div>
+        <div class="infra-row">
+          <span class="infra-box ib-amber">Database<small>2 Instances</small></span>
+          <span class="infra-box ib-cyan">Cache<small>2 Instances</small></span>
+          <span class="infra-box ib-rose">Queue<small>2 Instances</small></span>
+        </div>
+      </div>
+      <div class="infra-count-row">
+        <div><p class="lbl">Hosts</p><p class="val">24</p><p class="sub green">Up: 23</p></div>
+        <div><p class="lbl">Containers</p><p class="val">18</p><p class="sub blue">Running</p></div>
+        <div><p class="lbl">Databases</p><p class="val">3</p><p class="sub green">Healthy</p></div>
+        <div><p class="lbl">Services</p><p class="val">32</p><p class="sub blue">Running</p></div>
+      </div>
+      <a href="../infrastructure/index.html" class="panel-link-btn">View Infrastructure →</a>
+    </div>
+
+    <!-- Log Monitoring -->
+    <div class="int-panel">
+      <h3>Log Monitoring</h3>
+      <div class="mini-stats-grid" style="margin-bottom:12px;">
+        <div class="mini-stat"><p class="ms-label">Logs/min</p><p class="ms-val blue">1.2M</p></div>
+        <div class="mini-stat"><p class="ms-label">Error</p><p class="ms-val red">4.3K</p></div>
+        <div class="mini-stat"><p class="ms-label">Warn</p><p class="ms-val" style="color:#b45309;">12.7K</p></div>
+        <div class="mini-stat"><p class="ms-label">Info</p><p class="ms-val" style="color:#3a3648;">1.1M</p></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <p style="font-size:12px;font-weight:700;color:#3a3648;">Recent Logs</p>
+        <a href="../log-analytics/index.html" style="font-size:11px;color:#7c3aed;font-weight:600;">View All →</a>
+      </div>
+      <div class="log-scroll" id="log-stream"></div>
+      <a href="../log-analytics/index.html" class="panel-link-btn">View Log Explorer →</a>
+    </div>
+
+  </div>
+
+  <!-- API Details -->
+  <div class="api-details">
+    <h3>Datadog API Integration Details</h3>
+    <div class="api-grid">
+      <div class="api-item"><span>API Endpoint</span><strong>https://api.datadoghq.com</strong></div>
+      <div class="api-item"><span>API Version</span><strong>v1</strong></div>
+      <div class="api-item"><span>Auth Method</span><strong>API Key</strong></div>
+      <div class="api-item"><span>Rate Limit</span><strong>300 req/min</strong></div>
+      <div class="api-item"><span>Integration Type</span><strong>Metrics, Logs, APM</strong></div>
+      <div class="api-item"><span>Last Successful Request</span><strong class="success" id="last-req">—</strong></div>
+    </div>
+    <div class="api-actions">
+      <button class="api-btn">Edit Configuration</button>
+      <button class="api-btn danger">Disconnect</button>
+    </div>
+  </div>
+
+</main>
+
+<script src="../shared-dashboard.js"></script>
+<script>
+function miniChart(id, color) {
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: Array(15).fill(''),
+      datasets: [{ data: Array(15).fill(0).map(() => Math.floor(Math.random()*25)+40), borderColor: color, borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.35 }]
+    },
+    options: { plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, responsive:true, maintainAspectRatio:false, layout:{padding:{top:2,bottom:2}} }
+  });
+}
+
+const cpuChart    = miniChart('cpuChart',   '#3b82f6');
+const memChart    = miniChart('memChart',   '#a855f7');
+const diskChart   = miniChart('diskChart',  '#f59e0b');
+const netInChart  = miniChart('netInChart', '#10b981');
+const netOutChart = miniChart('netOutChart','#6366f1');
+
+const logs = [
+  { time:'10:30:42', svc:'user-service',         lvl:'ERROR', msg:'Failed to fetch user details',      cls:'badge-error' },
+  { time:'10:30:41', svc:'order-service',        lvl:'WARN',  msg:'High response time detected',       cls:'badge-warn'  },
+  { time:'10:30:40', svc:'payment-service',      lvl:'ERROR', msg:'Payment gateway timeout',           cls:'badge-error' },
+  { time:'10:30:39', svc:'inventory-service',    lvl:'INFO',  msg:'Stock updated successfully',        cls:'badge-info'  },
+  { time:'10:30:38', svc:'notification-service', lvl:'INFO',  msg:'Email sent successfully',           cls:'badge-info'  },
+];
+function renderLogs() {
+  document.getElementById('log-stream').innerHTML = logs.map(l =>
+    `<div class="log-entry"><span class="log-time">${l.time}</span><span class="log-svc">${l.svc}</span><span class="log-badge ${l.cls}">${l.lvl}</span><span class="log-msg">${l.msg}</span></div>`
+  ).join('');
+}
+renderLogs();
+
+function now() {
+  return new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});
+}
+async function fetchMetrics() {
+  try {
+    const res = await fetch('/api/metrics');
+    const d = await res.json();
+    document.getElementById('cpu-txt').innerHTML = `${d.cpu}% <span>Avg</span>`;
+    document.getElementById('mem-txt').innerHTML = `${d.memory}% <span>Avg</span>`;
+    cpuChart.data.datasets[0].data.push(d.cpu); cpuChart.data.datasets[0].data.shift(); cpuChart.update();
+    memChart.data.datasets[0].data.push(d.memory); memChart.data.datasets[0].data.shift(); memChart.update();
+  } catch(e) { console.warn('Sync paused', e); }
+  const t = now();
+  document.getElementById('last-updated').textContent = t;
+  document.getElementById('last-req').textContent = t;
+}
+fetchMetrics();
+setInterval(fetchMetrics, 2000);
+</script>
+</body>
+</html>

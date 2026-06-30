@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APM - Datadog Dashboard</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../shared-dashboard.css">
+</head>
+<body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a class="active" href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main">
+  <header class="topbar"><div><h1>APM Services</h1><p>Trace latency, throughput, error rates, and service dependencies.</p></div><div class="top-actions"><button class="icon-btn"><i class="fa-solid fa-rotate"></i></button><div class="avatar" data-user-avatar>A</div></div></header>
+  <section class="content">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">Requests</span><span class="kpi-icon"><i class="fa-solid fa-code-branch"></i></span></div><div class="kpi-value">12.8K</div><div class="kpi-sub">req/sec</div></div>
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">P95 Latency</span><span class="kpi-icon"><i class="fa-solid fa-stopwatch"></i></span></div><div class="kpi-value">245ms</div><div class="kpi-sub">Target under 300ms</div></div>
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">Error Rate</span><span class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></span></div><div class="kpi-value">0.31%</div><div class="kpi-sub">Stable</div></div>
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">Services</span><span class="kpi-icon"><i class="fa-solid fa-cubes"></i></span></div><div class="kpi-value">32</div><div class="kpi-sub">5 critical paths</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel"><div class="panel-title"><h2>Latency Trend</h2><span class="pill blue">Live</span></div><div class="chart" data-bars="35,42,38,55,62,58,51,70,66,64,72,63,59,74"></div></div>
+      <div class="panel"><div class="panel-title"><h2>Top Services</h2></div><table><thead><tr><th>Service</th><th>Requests</th><th>Error</th><th>Latency</th></tr></thead><tbody><tr><td>user-service</td><td>3.2K/s</td><td><span class="pill green">0.15%</span></td><td>120ms</td></tr><tr><td>order-service</td><td>2.9K/s</td><td><span class="pill amber">0.23%</span></td><td>210ms</td></tr><tr><td>payment-service</td><td>2.1K/s</td><td><span class="pill red">0.31%</span></td><td>350ms</td></tr></tbody></table></div>
+    </div>
+  </section>
+</main>
+<script src="../shared-dashboard.js"></script>
+</body>
+</html>

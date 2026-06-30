@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alert Management - Datadog</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../shared-dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.alert-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+.alert-kpi{background:#fff;border:1px solid #ebeaf3;border-radius:10px;padding:18px;box-shadow:0 1px 5px rgba(17,12,46,.04);text-align:center;}
+.alert-kpi i{font-size:22px;margin-bottom:8px;}
+.alert-kpi h4{font-size:12px;color:#9590a8;font-weight:700;text-transform:uppercase;margin-bottom:6px;}
+.alert-kpi h2{font-size:26px;font-weight:800;color:#120f22;}
+.i-blue{color:#2563eb;} .i-red{color:#dc2626;} .i-orange{color:#b45309;} .i-green{color:#16a34a;}
+.alert-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px;}
+.alert-panel{background:#fff;border:1px solid #ebeaf3;border-radius:10px;padding:18px;box-shadow:0 1px 5px rgba(17,12,46,.04);}
+.alert-panel h3{font-size:13px;font-weight:700;color:#161225;margin-bottom:14px;}
+.alert-panel canvas{height:220px!important;}
+.channels{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.channel{background:#f8f7fc;border:1px solid #ebeaf3;border-radius:9px;padding:14px;text-align:center;}
+.channel h3{font-size:12px;color:#9590a8;font-weight:700;margin-bottom:6px;}
+.channel h2{font-size:22px;font-weight:800;color:#120f22;margin-bottom:2px;}
+.channel p{font-size:11px;color:#9590a8;margin-bottom:8px;}
+.channel button{border:1px solid #ddd6fe;background:#fff;color:#7c3aed;border-radius:7px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+.channel button:hover{background:#f5f3ff;}
+.table-panel{background:#fff;border:1px solid #ebeaf3;border-radius:10px;padding:18px;margin-bottom:20px;box-shadow:0 1px 5px rgba(17,12,46,.04);}
+.table-panel h3{font-size:13px;font-weight:700;color:#161225;margin-bottom:12px;}
+.table-panel table{width:100%;border-collapse:collapse;font-size:13px;}
+.table-panel th{font-size:11px;text-transform:uppercase;color:#9590a8;text-align:left;padding:8px;border-bottom:1px solid #ebeaf3;}
+.table-panel td{padding:10px 8px;border-bottom:1px solid #f3f3f8;color:#3a3648;}
+.badge{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;}
+.badge.critical{background:#fee2e2;color:#dc2626;}
+.badge.warning{background:#fef3c7;color:#b45309;}
+.badge.info{background:#dbeafe;color:#1d4ed8;}
+.incident-panel{background:linear-gradient(135deg,#10052e,#1e1054);border-radius:10px;padding:22px;color:#fff;}
+.incident-panel h3{font-size:15px;margin-bottom:14px;}
+.incident-panel h2{font-size:18px;font-weight:800;margin-bottom:8px;}
+.incident-panel p{color:rgba(255,255,255,.75);font-size:13px;margin-bottom:14px;}
+.timeline{display:grid;gap:8px;}
+.timeline div{background:rgba(255,255,255,.08);border-radius:8px;padding:9px 14px;font-size:12px;color:rgba(255,255,255,.85);}
+</style>
+</head>
+<body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a class="active" href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main">
+  <header class="topbar">
+    <div><h1>Alert Management</h1><p>Manage alerts, notifications &amp; critical incidents</p></div>
+    <div class="top-actions"><div class="avatar" data-user-avatar>A</div></div>
+  </header>
+  <section class="content">
+
+    <div class="alert-kpi-grid">
+      <div class="alert-kpi"><i class="fa-solid fa-bell i-blue"></i><h4>Total Alerts</h4><h2 id="totalAlerts">128</h2></div>
+      <div class="alert-kpi"><i class="fa-solid fa-triangle-exclamation i-red"></i><h4>Critical</h4><h2 id="criticalAlerts">16</h2></div>
+      <div class="alert-kpi"><i class="fa-solid fa-circle-exclamation i-orange"></i><h4>Warnings</h4><h2 id="warningAlerts">42</h2></div>
+      <div class="alert-kpi"><i class="fa-solid fa-circle-info i-blue"></i><h4>Info Alerts</h4><h2 id="infoAlerts">70</h2></div>
+      <div class="alert-kpi"><i class="fa-solid fa-circle-check i-green"></i><h4>Resolved</h4><h2 id="resolvedAlerts">312</h2></div>
+    </div>
+
+    <div class="alert-grid">
+      <div class="alert-panel">
+        <h3>Alert Overview</h3>
+        <canvas id="alertChart"></canvas>
+      </div>
+      <div class="alert-panel">
+        <h3>Notification Channels</h3>
+        <div class="channels">
+          <div class="channel"><h3>Email Alerts</h3><h2>128</h2><p>Emails Sent</p><button>Manage</button></div>
+          <div class="channel"><h3>SMS Alerts</h3><h2>45</h2><p>SMS Sent</p><button>Manage</button></div>
+          <div class="channel"><h3>Slack Alerts</h3><h2>96</h2><p>Messages Sent</p><button>Manage</button></div>
+          <div class="channel"><h3>Webhook</h3><h2>28</h2><p>Requests Sent</p><button>Manage</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-panel">
+      <h3>Alert List</h3>
+      <table>
+        <thead><tr><th>Alert Name</th><th>Source</th><th>Severity</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>High CPU Usage</td><td>web-server-01</td><td><span class="badge critical">Critical</span></td><td>Active</td></tr>
+          <tr><td>Database Timeout</td><td>db-server-01</td><td><span class="badge warning">Warning</span></td><td>Active</td></tr>
+          <tr><td>SSL Expiring Soon</td><td>web-server-02</td><td><span class="badge info">Info</span></td><td>Active</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="incident-panel">
+      <h3>🚨 Critical Incident Detection</h3>
+      <h2>Database Connection Failure</h2>
+      <p>Multiple database connection failures detected across services.</p>
+      <div class="timeline">
+        <div>12:14 PM — Incident Detected</div>
+        <div>12:15 PM — Engineering Team Notified</div>
+        <div>12:16 PM — Investigation Started</div>
+      </div>
+    </div>
+
+  </section>
+</main>
+<script src="../shared-dashboard.js"></script>
+<script>
+function random(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+const alertChart = new Chart(document.getElementById('alertChart'),{
+  type:'line',
+  data:{
+    labels:['10:30','10:45','11:00','11:15','11:30','11:45','12:00','12:15'],
+    datasets:[
+      {label:'Critical', data:[55,68,64,72,60,70,65,67], borderColor:'#dc2626', backgroundColor:'rgba(220,38,38,.1)', fill:true, tension:.4, borderWidth:2},
+      {label:'Warning',  data:[40,45,43,48,39,46,42,41], borderColor:'#b45309', backgroundColor:'rgba(180,83,9,.08)',  fill:true, tension:.4, borderWidth:2},
+      {label:'Info',     data:[20,26,22,28,19,27,24,25], borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,.08)', fill:true, tension:.4, borderWidth:2},
+      {label:'Resolved', data:[8,10,9,11,7,10,9,8],      borderColor:'#16a34a', backgroundColor:'rgba(22,163,74,.08)', fill:true, tension:.4, borderWidth:2}
+    ]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{position:'top'}},
+    scales:{y:{beginAtZero:true}}
+  }
+});
+
+setInterval(()=>{
+  document.getElementById('totalAlerts').innerHTML    = random(100,200);
+  document.getElementById('criticalAlerts').innerHTML = random(10,25);
+  document.getElementById('warningAlerts').innerHTML  = random(20,60);
+  document.getElementById('infoAlerts').innerHTML     = random(50,100);
+  document.getElementById('resolvedAlerts').innerHTML = random(250,400);
+  alertChart.data.datasets.forEach(ds=>{ ds.data.shift(); ds.data.push(random(5,80)); });
+  alertChart.update();
+},3000);
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - AI-Observability Platform</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{min-height:100vh;background:#f0f4ff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:30px 16px;}
+
+/* ── Page Title ── */
+.page-title{text-align:center;margin-bottom:24px;}
+.page-title h1{font-size:26px;font-weight:800;color:#1e1b4b;letter-spacing:0.5px;}
+.page-title p{font-size:13px;color:#6b7280;margin-top:4px;}
+.title-icons{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:520px;margin-bottom:8px;}
+.title-icon{width:52px;height:52px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:22px;box-shadow:0 4px 14px rgba(79,70,229,0.35);}
+
+/* ── Top Row: Login only ── */
+.top-row{display:flex;justify-content:center;width:100%;max-width:520px;margin-bottom:16px;}
+
+/* ── Left Blue Card ── */
+.left-card{background:linear-gradient(160deg,#0d1b6e,#1a237e,#0b2a6b);border-radius:16px;padding:30px 24px;color:white;display:flex;flex-direction:column;align-items:center;justify-content:space-between;min-height:360px;position:relative;overflow:hidden;}
+.left-card::before{content:'';position:absolute;width:220px;height:220px;background:rgba(255,255,255,0.04);border-radius:50%;top:-60px;left:-60px;}
+.lock-icon{width:100px;height:100px;background:rgba(255,255,255,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:44px;margin:10px auto 18px;box-shadow:0 0 40px rgba(255,255,255,0.1);}
+.left-card h2{font-size:17px;font-weight:700;text-align:center;margin-bottom:6px;}
+.left-card p{font-size:12px;color:rgba(255,255,255,0.65);text-align:center;line-height:1.6;}
+.left-badge{background:#3949ab;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:auto;}
+
+/* ── Login Form Panel ── */
+.login-panel{background:white;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.login-panel h2{font-size:22px;font-weight:700;color:#1e1b4b;margin-bottom:4px;}
+.login-panel>p{font-size:13px;color:#6b7280;margin-bottom:22px;}
+
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;letter-spacing:0.4px;}
+.input-wrap{position:relative;}
+.input-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:14px;}
+.input-wrap input,.form-group select{width:100%;padding:11px 13px 11px 38px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:14px;color:#1f2937;outline:none;transition:0.25s;background:white;}
+.input-wrap input:focus,.form-group select:focus{border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.12);}
+.form-group select{padding-left:13px;cursor:pointer;}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#9ca3af;cursor:pointer;font-size:14px;}
+
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:0.25s;margin-top:4px;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,70,229,0.4);}
+
+.contact-row{text-align:center;margin-top:14px;font-size:13px;color:#6b7280;}
+.contact-row a{color:#4f46e5;font-weight:600;text-decoration:none;}
+
+/* ── Right side: Dashboard preview ── */
+.right-preview{background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.preview-header h3{font-size:18px;font-weight:700;color:#1e1b4b;}
+.preview-header p{font-size:12px;color:#6b7280;}
+.preview-user{display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;}
+.preview-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.stat-card{background:#f8f9ff;border-radius:10px;padding:12px;text-align:center;}
+.stat-card .label{font-size:11px;color:#6b7280;margin-bottom:4px;}
+.stat-card .value{font-size:20px;font-weight:800;color:#1e1b4b;}
+.stat-card .value.red{color:#ef4444;}
+.stat-card .sub{font-size:10px;color:#9ca3af;}
+
+/* Charts area */
+.charts-row{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:14px;}
+.chart-box{background:#f8f9ff;border-radius:10px;padding:12px;}
+.chart-box h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;}
+.mini-chart{height:60px;display:flex;align-items:flex-end;gap:2px;}
+.bar{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#4f46e5,#7c3aed);opacity:0.7;transition:0.3s;}
+.donut-wrap{display:flex;align-items:center;gap:10px;}
+.donut{width:60px;height:60px;border-radius:50%;background:conic-gradient(#4f46e5 0% 35%,#22c55e 35% 60%,#f59e0b 60% 80%,#ef4444 80% 100%);flex-shrink:0;}
+.legend{font-size:10px;color:#374151;line-height:1.8;}
+.legend span{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
+
+/* Alerts table */
+.alerts-row{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;}
+.alert-table{background:#f8f9ff;border-radius:10px;padding:12px;}
+.alert-table h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;}
+.alert-row{display:grid;grid-template-columns:2fr 0.7fr 0.9fr 0.6fr;font-size:10px;padding:5px 0;border-bottom:1px solid #e5e7eb;align-items:center;}
+.alert-row.header{color:#9ca3af;font-weight:600;}
+.badge{padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;}
+.badge.critical{background:#fee2e2;color:#ef4444;}
+.badge.warning{background:#fef3c7;color:#d97706;}
+.badge.open{background:#dcfce7;color:#16a34a;}
+.system-health{background:#f8f9ff;border-radius:10px;padding:12px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}
+.health-icon{width:44px;height:44px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#16a34a;font-size:20px;margin-bottom:8px;}
+.health-title{font-size:13px;font-weight:700;color:#16a34a;}
+.health-sub{font-size:11px;color:#6b7280;}
+
+/* ── Bottom Row ── */
+.bottom-row{display:grid;grid-template-columns:1fr 1.8fr 1fr;gap:16px;width:100%;max-width:900px;}
+
+/* Role Based Access */
+.role-card{background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.role-card h4{font-size:13px;font-weight:800;background:#1e1b4b;color:white;padding:7px 12px;border-radius:8px;margin-bottom:14px;letter-spacing:0.5px;}
+.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.role-col{background:#f8f9ff;border-radius:10px;padding:10px;}
+.role-avatar{width:36px;height:36px;border-radius:50%;margin:0 auto 6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.role-badge{text-align:center;font-size:10px;font-weight:800;padding:2px 8px;border-radius:12px;margin-bottom:8px;display:block;}
+.badge-admin{background:#4f46e5;color:white;}
+.badge-devops{background:#8b5cf6;color:white;}
+.badge-user{background:#22c55e;color:white;}
+.role-item{font-size:9px;color:#374151;display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+.role-item i{font-size:8px;}
+.role-item i.yes{color:#22c55e;}
+.role-item i.no{color:#ef4444;}
+
+/* JWT Flow */
+.jwt-card{background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.jwt-card h4{font-size:13px;font-weight:800;background:#1e1b4b;color:white;padding:7px 12px;border-radius:8px;margin-bottom:16px;letter-spacing:0.5px;}
+.jwt-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.flow-step{text-align:center;}
+.flow-step .num{font-size:10px;color:#6b7280;margin-bottom:6px;}
+.flow-step .step-title{font-size:10px;font-weight:700;color:#1e1b4b;margin-bottom:6px;}
+.flow-icon{width:44px;height:44px;margin:0 auto;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.flow-icon.blue{background:#dbeafe;color:#4f46e5;}
+.flow-icon.green{background:#dcfce7;color:#16a34a;}
+.flow-icon.purple{background:#ede9fe;color:#7c3aed;}
+.flow-icon.shield{background:#dcfce7;color:#16a34a;}
+.flow-step p{font-size:9px;color:#6b7280;margin-top:6px;line-height:1.4;}
+.flow-arrow{display:flex;align-items:center;justify-content:center;padding-top:20px;color:#9ca3af;font-size:16px;}
+.jwt-steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;align-items:center;}
+.dashed-line{grid-column:1/-1;height:2px;border-top:2px dashed #d1d5db;margin:4px 0;position:relative;}
+.dashed-label{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:9px;color:#6b7280;white-space:nowrap;background:white;padding:0 6px;}
+
+/* Logout card */
+.logout-card{background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.logout-icon{width:56px;height:56px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#16a34a;font-size:26px;margin-bottom:12px;}
+.logout-card h3{font-size:15px;font-weight:700;color:#1e1b4b;margin-bottom:6px;}
+.logout-card p{font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.5;}
+.logout-btn{width:100%;padding:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+.logout-badge{background:#f3f4f6;border-radius:8px;padding:6px 16px;font-size:11px;font-weight:700;color:#374151;letter-spacing:0.5px;}
+
+.error-msg{background:#fee2e2;border:1px solid #fca5a5;color:#ef4444;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;}
+
+/* Sidebar preview strip */
+.sidebar-strip{background:#1c1243;border-radius:12px;padding:12px 10px;display:flex;flex-direction:column;gap:4px;min-width:130px;}
+.sidebar-item{font-size:11px;padding:6px 10px;border-radius:7px;color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;gap:7px;}
+.sidebar-item.active{background:#4f46e5;color:white;}
+.sidebar-logo{display:flex;align-items:center;gap:7px;color:white;font-size:13px;font-weight:700;margin-bottom:10px;padding:0 6px;}
+
+.preview-layout{display:grid;grid-template-columns:auto 1fr;gap:12px;}
+
+@media(max-width:700px){
+  .top-row,.bottom-row{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .roles-grid,.jwt-flow,.jwt-steps-row{grid-template-columns:repeat(2,1fr);}
+  .preview-layout{grid-template-columns:1fr;}
+  .sidebar-strip{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Title -->
+<div class="title-icons">
+  <div class="title-icon"><i class="fa-solid fa-shield-halved"></i></div>
+  <div class="page-title">
+    <h1>1. USER AUTHENTICATION MODULE</h1>
+    <p>Login / Logout &nbsp;•&nbsp; Role Based Access (Admin, DevOps, User) &nbsp;•&nbsp; JWT Authentication</p>
+  </div>
+  <div class="title-icon"><i class="fa-solid fa-user-circle"></i></div>
+</div>
+
+<!-- Top Row -->
+<div class="top-row">
+
+  <!-- Left Blue Card + Login Form -->
+  <div style="display:flex;flex-direction:column;gap:0;width:100%;max-width:420px;">
+
+    <!-- Blue Left -->
+    <div class="left-card" style="border-radius:16px 16px 0 0;">
+      <div class="lock-icon">🔒</div>
+      <h2>AI-Powered Observability</h2>
+      <p>Secure Login to continue monitoring your infrastructure</p>
+      <div class="left-badge">LOGIN SCREEN</div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-panel" style="border-radius:0 0 16px 16px;border-top:none;">
+      <h2>Login</h2>
+      <p>Welcome back! Please login to your account</p>
+      <div class="error-msg" id="errorMsg"><i class="fa-solid fa-circle-exclamation"></i> <span id="errText">Invalid credentials.</span></div>
+      <div class="form-group">
+        <label>Email</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="text" id="username" placeholder="Enter your email / username">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="password" placeholder="Enter your password">
+          <button class="eye-btn" onclick="togglePwd()"><i class="fa-solid fa-eye" id="eyeIco"></i></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="roleSelect">
+          <option value="">Select Role</option>
+          <option value="admin">Admin</option>
+          <option value="devops">DevOps</option>
+          <option value="user">User</option>
+        </select>
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+        <span id="btnTxt"><i class="fa-solid fa-right-to-bracket"></i> Login</span>
+        <span id="btnLoad" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> Signing in...</span>
+      </button>
+      <div class="contact-row" style="margin-top:12px;">Don't have an account? <a href="#">Contact Admin</a></div>
+    </div>
+
+  </div>
+
+
+</div>
+
+
+
+<script>
+function togglePwd(){
+  const i = document.getElementById('password');
+  const ico = document.getElementById('eyeIco');
+  i.type = i.type==='password' ? 'text' : 'password';
+  ico.className = i.type==='password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+}
+
+const users = {
+  admin:   {pass:'admin123',  role:'admin'},
+  aditya:  {pass:'aditya123', role:'devops'},
+  varad:   {pass:'varad123',  role:'devops'},
+  shourya: {pass:'shourya123',role:'user'},
+};
+
+function handleLogin(){
+  const username = document.getElementById('username').value.trim().toLowerCase();
+  const password = document.getElementById('password').value.trim();
+  const role     = document.getElementById('roleSelect').value;
+  const errDiv   = document.getElementById('errorMsg');
+  const errTxt   = document.getElementById('errText');
+  errDiv.style.display='none';
+
+  if(!username||!password){
+    errTxt.textContent='Please enter username and password.';
+    errDiv.style.display='block'; return;
+  }
+
+  document.getElementById('btnTxt').style.display='none';
+  document.getElementById('btnLoad').style.display='inline';
+  document.getElementById('loginBtn').disabled=true;
+
+  setTimeout(()=>{
+    const u = users[username];
+    if(u && u.pass===password && (!role || u.role===role)){
+      sessionStorage.setItem('loggedIn','true');
+      sessionStorage.setItem('user', username);
+      sessionStorage.setItem('role', u.role);
+      window.location.href='index.html';
+    } else {
+      document.getElementById('btnTxt').style.display='inline';
+      document.getElementById('btnLoad').style.display='none';
+      document.getElementById('loginBtn').disabled=false;
+      errTxt.textContent='Invalid username, password or role.';
+      errDiv.style.display='block';
+      document.getElementById('password').value='';
+    }
+  },1200);
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Enter') handleLogin(); });
+</script>
+</body>
+</html>

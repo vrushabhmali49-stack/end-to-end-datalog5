@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Monitors - Datadog Dashboard</title><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"><link rel="stylesheet" href="../shared-dashboard.css"></head><body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a class="active" href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main"><header class="topbar"><div><h1>Monitors</h1><p>Threshold, anomaly, uptime, and composite monitors.</p></div><div class="top-actions"><button class="primary-btn">Create Monitor</button><div class="avatar" data-user-avatar>A</div></div></header><section class="content">
+<div class="kpi-grid"><div class="kpi"><div class="kpi-top"><span class="kpi-label">Total Monitors</span><span class="kpi-icon"><i class="fa-solid fa-desktop"></i></span></div><div class="kpi-value">41</div><div class="kpi-sub">Across infrastructure and apps</div></div><div class="kpi"><div class="kpi-top"><span class="kpi-label">Triggered</span><span class="kpi-icon"><i class="fa-solid fa-bell"></i></span></div><div class="kpi-value">7</div><div class="kpi-sub">Needs attention</div></div><div class="kpi"><div class="kpi-top"><span class="kpi-label">Muted</span><span class="kpi-icon"><i class="fa-solid fa-volume-xmark"></i></span></div><div class="kpi-value">3</div><div class="kpi-sub">Scheduled maintenance</div></div><div class="kpi"><div class="kpi-top"><span class="kpi-label">SLO</span><span class="kpi-icon"><i class="fa-solid fa-bullseye"></i></span></div><div class="kpi-value">99.9%</div><div class="kpi-sub">Availability target</div></div></div>
+<div class="panel"><div class="panel-title"><h2>Active Monitor Rules</h2><span class="pill purple">Auto grouped</span></div><table><thead><tr><th>Monitor</th><th>Type</th><th>Scope</th><th>Status</th><th>Notify</th></tr></thead><tbody><tr><td>CPU above 85% for 5 minutes</td><td>Metric threshold</td><td>prod hosts</td><td><span class="pill red">Alert</span></td><td>#ops-alerts</td></tr><tr><td>API latency anomaly</td><td>Anomaly</td><td>payment-service</td><td><span class="pill amber">Warn</span></td><td>#backend</td></tr><tr><td>Homepage uptime check</td><td>Synthetic</td><td>public edge</td><td><span class="pill green">OK</span></td><td>#web</td></tr></tbody></table></div>
+</section></main><script src="../shared-dashboard.js"></script></body></html>

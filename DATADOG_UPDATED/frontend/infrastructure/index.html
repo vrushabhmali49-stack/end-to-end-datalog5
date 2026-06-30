@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infrastructure - Datadog Dashboard</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../shared-dashboard.css">
+</head>
+<body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a class="active" href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main"><header class="topbar"><div><h1>Infrastructure</h1><p>Hosts, containers, databases, load balancers, and cloud resources.</p></div><div class="top-actions"><button class="icon-btn"><i class="fa-solid fa-filter"></i></button><div class="avatar" data-user-avatar>A</div></div></header><section class="content">
+<div class="kpi-grid"><div class="kpi"><div class="kpi-top"><span class="kpi-label">Hosts</span><span class="kpi-icon"><i class="fa-solid fa-server"></i></span></div><div class="kpi-value">24</div><div class="kpi-sub">23 healthy, 1 warning</div></div><div class="kpi"><div class="kpi-top"><span class="kpi-label">Containers</span><span class="kpi-icon"><i class="fa-brands fa-docker"></i></span></div><div class="kpi-value">18</div><div class="kpi-sub">All reporting</div></div><div class="kpi"><div class="kpi-top"><span class="kpi-label">Databases</span><span class="kpi-icon"><i class="fa-solid fa-database"></i></span></div><div class="kpi-value">3</div><div class="kpi-sub">1 high disk usage</div></div><div class="kpi"><div class="kpi-top"><span class="kpi-label">Uptime</span><span class="kpi-icon"><i class="fa-solid fa-heart-pulse"></i></span></div><div class="kpi-value">99.98%</div><div class="kpi-sub">Last 30 days</div></div></div>
+<div class="panel"><div class="panel-title"><h2>Server Health Status</h2><span class="pill green">View All</span></div><table><thead><tr><th>Server</th><th>Status</th><th>CPU</th><th>Memory</th><th>Disk</th><th>Uptime</th></tr></thead><tbody><tr><td>web-server-01</td><td><span class="pill green">Healthy</span></td><td>38%</td><td>65%</td><td>70%</td><td>15d 4h</td></tr><tr><td>app-server-01</td><td><span class="pill amber">Warning</span></td><td>75%</td><td>85%</td><td>90%</td><td>8d 12h</td></tr><tr><td>db-server-01</td><td><span class="pill green">Healthy</span></td><td>35%</td><td>60%</td><td>65%</td><td>20d 3h</td></tr><tr><td>cache-server-01</td><td><span class="pill green">Healthy</span></td><td>25%</td><td>45%</td><td>55%</td><td>25d 6h</td></tr></tbody></table></div>
+</section></main><script src="../shared-dashboard.js"></script></body></html>

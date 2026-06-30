@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports - Datadog</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../shared-dashboard.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a class="active" href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main">
+
+    <div class="topbar">
+      <div>
+        <h1>Datadog Monitoring Reports</h1>
+        <p>End-to-End Datadog Monitoring with AI-Powered Observability</p>
+      </div>
+
+      <div class="profile">
+        <div class="profile-icon">SM</div>
+        <div>
+          <h4>Shourya Mali</h4>
+          <span>Reporting Module</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="report-control">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="changeReport('Daily', this)">Daily</button>
+        <button class="tab-btn" onclick="changeReport('Weekly', this)">Weekly</button>
+        <button class="tab-btn" onclick="changeReport('Monthly', this)">Monthly</button>
+      </div>
+
+      <div class="date-box">
+        <label for="reportDate">Report Date:</label>
+        <input type="date" id="reportDate">
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <p class="stat-title">System Uptime</p>
+        <h2 class="stat-value" id="uptime">99.8%</h2>
+        <p class="stat-change">▲ 0.4% from previous period</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Total Alerts</p>
+        <h2 class="stat-value" id="alerts">12</h2>
+        <p class="stat-change red">▲ 3 new alerts detected</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Total Errors</p>
+        <h2 class="stat-value" id="errors">7</h2>
+        <p class="stat-change">▼ 18% fewer errors</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Average CPU Usage</p>
+        <h2 class="stat-value" id="cpu">64%</h2>
+        <p class="stat-change red">▲ High usage at 2:00 PM</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Average Memory</p>
+        <h2 class="stat-value" id="memory">71%</h2>
+        <p class="stat-change">▼ 5% optimized usage</p>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="card">
+        <div class="card-title">
+          <h3>CPU & Memory Usage</h3>
+          <span class="badge" id="chartPeriod">Daily View</span>
+        </div>
+        <div class="chart-box">
+          <canvas id="resourceChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h3>Alerts Trend</h3>
+          <span class="badge">Live Analysis</span>
+        </div>
+        <div class="chart-box">
+          <canvas id="alertChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="bottom-grid">
+      <div class="ai-card">
+        <h3>🤖 AI-Powered Observability Summary</h3>
+        <p id="aiSummary">
+          AI has analyzed your Datadog monitoring data and found important system patterns.
+        </p>
+
+        <ul class="ai-insights" id="aiInsights">
+          <li>⚠️ High CPU usage detected in Payment Service between 1 PM and 3 PM.</li>
+          <li>🔍 Repeated database timeout errors found in Authentication Service.</li>
+          <li>💡 Recommendation: Enable auto-scaling for peak traffic hours.</li>
+          <li>📈 API response time improved by 12% compared to yesterday.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h3>Top Affected Services</h3>
+          <span class="badge">Service Health</span>
+        </div>
+
+        <ul class="service-list">
+          <li>
+            <span>Payment Service</span>
+            <span class="status danger">Critical</span>
+          </li>
+          <li>
+            <span>Authentication Service</span>
+            <span class="status warning">Warning</span>
+          </li>
+          <li>
+            <span>Database Service</span>
+            <span class="status warning">Warning</span>
+          </li>
+          <li>
+            <span>Notification Service</span>
+            <span class="status good">Healthy</span>
+          </li>
+          <li>
+            <span>User Management Service</span>
+            <span class="status good">Healthy</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="table-card">
+      <div class="card-title">
+        <h3 id="tableTitle">Daily Monitoring Data</h3>
+        <span class="badge">Datadog Metrics</span>
+      </div>
+
+      <table id="reportTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Service Name</th>
+            <th>CPU Usage</th>
+            <th>Memory Usage</th>
+            <th>Alerts</th>
+            <th>Errors</th>
+            <th>Uptime</th>
+          </tr>
+        </thead>
+
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <div class="buttons">
+        <button class="btn pdf-btn" onclick="downloadPDF()">📄 Download PDF Report</button>
+        <button class="btn excel-btn" onclick="downloadExcel()">📗 Download Excel Report</button>
+      </div>
+    </section>
+
+    <footer>
+      Prepared by: <strong>Shourya Mali</strong> | Reporting Module | Datadog Monitoring Project
+    </footer>
+
+  </main>
+
+  <script>
+    let currentReport = "Daily";
+    let resourceChart;
+    let alertChart;
+
+    const reportData = {
+      Daily: {
+        uptime: "99.8%",
+        alerts: "12",
+        errors: "7",
+        cpu: "64%",
+        memory: "71%",
+        labels: ["8 AM", "10 AM", "12 PM", "2 PM", "4 PM", "6 PM", "8 PM"],
+        cpuData: [45, 52, 61, 88, 72, 60, 54],
+        memoryData: [52, 58, 63, 75, 74, 70, 66],
+        alertData: [1, 2, 1, 5, 2, 1, 0],
+        summary: "Today, the system uptime was 99.8%. High CPU usage was detected during afternoon hours. AI recommends checking the Payment Service and database connection.",
+        insights: [
+          "⚠️ High CPU usage detected in Payment Service between 1 PM and 3 PM.",
+          "🔍 Repeated database timeout errors found in Authentication Service.",
+          "💡 Recommendation: Enable auto-scaling for peak traffic hours.",
+          "📈 API response time improved by 12% compared to yesterday."
+        ]
+      },
+
+      Weekly: {
+        uptime: "99.4%",
+        alerts: "48",
+        errors: "22",
+        cpu: "68%",
+        memory: "73%",
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        cpuData: [55, 60, 67, 73, 82, 66, 58],
+        memoryData: [62, 66, 70, 75, 79, 72, 68],
+        alertData: [5, 7, 6, 9, 12, 5, 4],
+        summary: "This week, CPU usage increased by 15% compared to the previous week. Payment Service generated the highest number of alerts. AI recommends optimizing database queries.",
+        insights: [
+          "📊 CPU usage increased by 15% compared to last week.",
+          "🚨 Payment Service generated the highest number of alerts.",
+          "🔍 Database timeout error is the most repeated issue.",
+          "💡 Recommendation: Optimize slow API endpoints and database queries."
+        ]
+      },
+
+      Monthly: {
+        uptime: "98.9%",
+        alerts: "176",
+        errors: "89",
+        cpu: "72%",
+        memory: "76%",
+        labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+        cpuData: [64, 69, 75, 80],
+        memoryData: [68, 72, 78, 81],
+        alertData: [35, 42, 54, 45],
+        summary: "This month, the system maintained 98.9% uptime. Authentication Service had the most critical incidents. AI recommends enabling auto-scaling and improving error handling.",
+        insights: [
+          "📈 Resource usage increased gradually throughout the month.",
+          "🚨 Authentication Service had the highest critical alerts.",
+          "⚠️ Peak traffic caused memory usage to reach 81%.",
+          "💡 Recommendation: Enable auto-scaling and improve load balancing."
+        ]
+      }
+    };
+
+    const services = [
+      "Payment Service",
+      "Authentication Service",
+      "Database Service",
+      "Notification Service",
+      "User Management Service"
+    ];
+
+    function setTodayDate() {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("reportDate").value = today;
+    }
+
+    function generateTableData() {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+
+      const data = reportData[currentReport];
+      const selectedDate = document.getElementById("reportDate").value;
+
+      services.forEach((service, index) => {
+        let cpu = Math.max(45, Number(data.cpu.replace("%", "")) + index * 3 - 5);
+        let memory = Math.max(50, Number(data.memory.replace("%", "")) + index * 2 - 4);
+        let alerts = Math.max(0, Math.floor(Number(data.alerts) / 5) + index);
+        let errors = Math.max(0, Math.floor(Number(data.errors) / 4) + (index % 3));
+        let uptime = (99.9 - index * 0.2).toFixed(1) + "%";
+
+        const row = `
+          <tr>
+            <td>${selectedDate}</td>
+            <td>${service}</td>
+            <td>${cpu}%</td>
+            <td>${memory}%</td>
+            <td>${alerts}</td>
+            <td>${errors}</td>
+            <td>${uptime}</td>
+          </tr>
+        `;
+
+        tbody.innerHTML += row;
+      });
+    }
+
+    function createCharts() {
+      const data = reportData[currentReport];
+
+      if (resourceChart) resourceChart.destroy();
+      if (alertChart) alertChart.destroy();
+
+      const resourceCtx = document.getElementById("resourceChart").getContext("2d");
+      const alertCtx = document.getElementById("alertChart").getContext("2d");
+
+      resourceChart = new Chart(resourceCtx, {
+        type: "line",
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: "CPU Usage (%)",
+              data: data.cpuData,
+              borderColor: "#7c3aed",
+              backgroundColor: "rgba(124, 58, 237, 0.12)",
+              fill: true,
+              tension: 0.4,
+              borderWidth: 3
+            },
+            {
+              label: "Memory Usage (%)",
+              data: data.memoryData,
+              borderColor: "#2563eb",
+              backgroundColor: "rgba(37, 99, 235, 0.08)",
+              fill: true,
+              tension: 0.4,
+              borderWidth: 3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top"
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100
+            }
+          }
+        }
+      });
+
+      alertChart = new Chart(alertCtx, {
+        type: "bar",
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: "Alerts",
+              data: data.alertData,
+              backgroundColor: [
+                "#7c3aed",
+                "#8b5cf6",
+                "#6366f1",
+                "#ef4444",
+                "#f59e0b",
+                "#3b82f6",
+                "#22c55e"
+              ],
+              borderRadius: 8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function updateDashboard() {
+      const data = reportData[currentReport];
+
+      document.getElementById("uptime").innerText = data.uptime;
+      document.getElementById("alerts").innerText = data.alerts;
+      document.getElementById("errors").innerText = data.errors;
+      document.getElementById("cpu").innerText = data.cpu;
+      document.getElementById("memory").innerText = data.memory;
+
+      document.getElementById("chartPeriod").innerText = currentReport + " View";
+      document.getElementById("tableTitle").innerText = currentReport + " Monitoring Data";
+      document.getElementById("aiSummary").innerText = data.summary;
+
+      const insightsBox = document.getElementById("aiInsights");
+      insightsBox.innerHTML = "";
+
+      data.insights.forEach(insight => {
+        insightsBox.innerHTML += `<li>${insight}</li>`;
+      });
+
+      generateTableData();
+      createCharts();
+    }
+
+    function changeReport(reportType, button) {
+      currentReport = reportType;
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      button.classList.add("active");
+      updateDashboard();
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      const data = reportData[currentReport];
+      const date = document.getElementById("reportDate").value;
+
+      pdf.setFontSize(18);
+      pdf.setTextColor(60, 30, 140);
+      pdf.text("Datadog Monitoring Report", 20, 20);
+
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("Project: End-to-End Datadog Monitoring with AI-Powered Observability", 20, 30);
+      pdf.text("Report Type: " + currentReport, 20, 38);
+      pdf.text("Report Date: " + date, 20, 46);
+      pdf.text("Prepared By: Shourya Mali", 20, 54);
+
+      pdf.setFontSize(14);
+      pdf.setTextColor(60, 30, 140);
+      pdf.text("Monitoring Summary", 20, 68);
+
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("System Uptime: " + data.uptime, 20, 78);
+      pdf.text("Total Alerts: " + data.alerts, 20, 86);
+      pdf.text("Total Errors: " + data.errors, 20, 94);
+      pdf.text("Average CPU Usage: " + data.cpu, 20, 102);
+      pdf.text("Average Memory Usage: " + data.memory, 20, 110);
+
+      pdf.setFontSize(14);
+      pdf.setTextColor(60, 30, 140);
+      pdf.text("AI-Powered Observability Summary", 20, 126);
+
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
+
+      const splitSummary = pdf.splitTextToSize(data.summary, 170);
+      pdf.text(splitSummary, 20, 136);
+
+      let y = 155;
+
+      pdf.setFontSize(12);
+      pdf.setTextColor(60, 30, 140);
+      pdf.text("AI Recommendations:", 20, y);
+
+      y += 10;
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
+
+      data.insights.forEach((insight) => {
+        const splitInsight = pdf.splitTextToSize("- " + insight, 170);
+        pdf.text(splitInsight, 20, y);
+        y += 12;
+      });
+
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("Generated from Datadog Monitoring Reporting Module", 20, 285);
+
+      pdf.save(currentReport + "_Datadog_Monitoring_Report.pdf");
+    }
+
+    function downloadExcel() {
+      const workbook = XLSX.utils.book_new();
+
+      const data = reportData[currentReport];
+      const date = document.getElementById("reportDate").value;
+
+      const reportRows = [
+        ["Project Name", "End-to-End Datadog Monitoring with AI-Powered Observability"],
+        ["Prepared By", "Shourya Mali"],
+        ["Report Type", currentReport],
+        ["Report Date", date],
+        [],
+        ["Metric", "Value"],
+        ["System Uptime", data.uptime],
+        ["Total Alerts", data.alerts],
+        ["Total Errors", data.errors],
+        ["Average CPU Usage", data.cpu],
+        ["Average Memory Usage", data.memory]
+      ];
+
+      const summarySheet = XLSX.utils.aoa_to_sheet(reportRows);
+      XLSX.utils.book_append_sheet(workbook, summarySheet, currentReport + " Summary");
+
+      const table = document.getElementById("reportTable");
+      const dataSheet = XLSX.utils.table_to_sheet(table);
+      XLSX.utils.book_append_sheet(workbook, dataSheet, currentReport + " Data");
+
+      const alertLogs = [
+        ["Alert ID", "Service", "Severity", "Message", "Status"],
+        ["ALT-1001", "Payment Service", "Critical", "High CPU usage detected", "Open"],
+        ["ALT-1002", "Authentication Service", "Warning", "Database timeout error", "Investigating"],
+        ["ALT-1003", "Database Service", "Warning", "Memory usage above threshold", "Open"],
+        ["ALT-1004", "Notification Service", "Info", "API response delay", "Resolved"]
+      ];
+
+      const alertSheet = XLSX.utils.aoa_to_sheet(alertLogs);
+      XLSX.utils.book_append_sheet(workbook, alertSheet, "Alert Logs");
+
+      XLSX.writeFile(workbook, currentReport + "_Datadog_Monitoring_Report.xlsx");
+    }
+
+    document.getElementById("reportDate").addEventListener("change", generateTableData);
+
+    setTodayDate();
+    updateDashboard();
+  </script>
+<script src="../shared-dashboard.js"></script>
+</body>
+</html>

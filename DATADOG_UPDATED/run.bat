@@ -1,0 +1,6 @@
+@echo off
+echo Installing dependencies...
+pip install -r requirements.txt --quiet
+echo Starting Datadog Monitoring Platform...
+python app.py
+pause

@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Integrations - Datadog Dashboard</title><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"><link rel="stylesheet" href="../shared-dashboard.css"></head><body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a class="active" href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main"><header class="topbar"><div><h1>Integrations</h1><p>Cloud, container, database, messaging, and notification integrations.</p></div><div class="top-actions"><button class="primary-btn">Add Integration</button><div class="avatar" data-user-avatar>A</div></div></header><section class="content">
+<div class="cards"><div class="mini-card"><i class="fa-brands fa-aws"></i><h3>AWS</h3><p>EC2, RDS, ELB, Lambda, and CloudWatch metrics connected.</p></div><div class="mini-card"><i class="fa-brands fa-docker"></i><h3>Docker</h3><p>Container runtime metrics, image tags, and restart events.</p></div><div class="mini-card"><i class="fa-solid fa-database"></i><h3>PostgreSQL</h3><p>Query latency, locks, replication, and storage monitoring.</p></div><div class="mini-card"><i class="fa-brands fa-slack"></i><h3>Slack</h3><p>Alert routing to DevOps, backend, and incident channels.</p></div></div>
+<div class="panel" style="margin-top:16px"><div class="panel-title"><h2>Integration Health</h2></div><table><thead><tr><th>Name</th><th>Category</th><th>Status</th><th>Last Sync</th></tr></thead><tbody><tr><td>AWS Production</td><td>Cloud</td><td><span class="pill green">Connected</span></td><td>30 sec ago</td></tr><tr><td>Kubernetes Cluster</td><td>Containers</td><td><span class="pill green">Connected</span></td><td>45 sec ago</td></tr><tr><td>PagerDuty</td><td>Incident</td><td><span class="pill amber">Needs token refresh</span></td><td>2h ago</td></tr></tbody></table></div>
+</section></main><script src="../shared-dashboard.js"></script></body></html>

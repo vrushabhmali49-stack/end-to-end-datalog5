@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Analytics - Datadog</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../shared-dashboard.css">
+<style>
+  .log-table-wrap { overflow-x: auto; }
+  .badge { display:inline-block; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:800; }
+  .badge-error { background:#fee2e2; color:#dc2626; }
+  .badge-warn  { background:#fef3c7; color:#b45309; }
+  .badge-info  { background:#dbeafe; color:#1d4ed8; }
+  .badge-debug { background:#f3f4f6; color:#6b7280; }
+  .insight-card { display:flex; align-items:flex-start; gap:12px; padding:12px; border:1px solid #ebeaf3; border-radius:10px; margin-bottom:10px; }
+  .insight-icon { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; font-size:16px; }
+  .insight-icon.high   { background:#fee2e2; color:#dc2626; }
+  .insight-icon.med    { background:#fef3c7; color:#b45309; }
+  .insight-icon.info   { background:#dbeafe; color:#1d4ed8; }
+  .insight-text h4     { font-size:13px; font-weight:700; color:#161225; }
+  .insight-text p      { font-size:12px; color:#6b7280; margin-top:3px; }
+  .search-bar { display:flex; gap:10px; margin-bottom:14px; }
+  .search-bar input { flex:1; padding:9px 13px; border:1px solid #e0dff0; border-radius:8px; font-size:13px; outline:none; }
+  .search-bar input:focus { border-color:#7c3aed; }
+  .search-bar select { padding:9px 12px; border:1px solid #e0dff0; border-radius:8px; font-size:13px; background:#fff; }
+  .search-bar button { padding:9px 18px; background:linear-gradient(135deg,#6d28d9,#8b5cf6); color:#fff; border:none; border-radius:8px; font-size:13px; cursor:pointer; font-weight:700; }
+  .donut-wrap { position:relative; width:160px; height:160px; margin:0 auto 16px; }
+  .donut-wrap svg { width:100%; height:100%; }
+  .donut-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .donut-center .big { font-size:26px; font-weight:800; color:#161225; }
+  .donut-center .sub { font-size:11px; color:#6b7280; }
+  .legend { display:flex; flex-direction:column; gap:8px; }
+  .legend-row { display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:7px; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:#2ecc71; display:inline-block; animation:pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  #logChart { width:100%; height:200px; }
+</style>
+</head>
+<body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a class="active" href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div>
+      <h1><span class="live-dot"></span> Log Analytics</h1>
+      <p>Centralized log collection · error detection · AI-based insights</p>
+    </div>
+    <div class="top-actions">
+      <span style="font-size:12px;color:#6b7280;" id="lastUpdate">Last updated: just now</span>
+      <div class="avatar" id="avatarEl">A</div>
+    </div>
+  </header>
+
+  <section class="content">
+
+    <!-- KPI Row -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Logs Ingested</span>
+          <div class="kpi-icon"><i class="fa-solid fa-inbox"></i></div>
+        </div>
+        <div class="kpi-value" id="kpiTotal">1.24M</div>
+        <div class="kpi-sub">logs / minute</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Error Logs</span>
+          <div class="kpi-icon" style="background:#fee2e2;color:#dc2626;"><i class="fa-solid fa-circle-xmark"></i></div>
+        </div>
+        <div class="kpi-value" style="color:#dc2626;" id="kpiError">4,312</div>
+        <div class="kpi-sub">logs / minute</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Warn Logs</span>
+          <div class="kpi-icon" style="background:#fef3c7;color:#b45309;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        </div>
+        <div class="kpi-value" style="color:#b45309;" id="kpiWarn">12,748</div>
+        <div class="kpi-sub">logs / minute</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Info Logs</span>
+          <div class="kpi-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-circle-info"></i></div>
+        </div>
+        <div class="kpi-value" style="color:#1d4ed8;" id="kpiInfo">1.10M</div>
+        <div class="kpi-sub">logs / minute</div>
+      </div>
+    </div>
+
+    <!-- Chart + Donut -->
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="panel">
+        <div class="panel-title">
+          <h2>Log Volume Over Time</h2>
+          <span class="pill green"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Live</span>
+        </div>
+        <svg id="logChart" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><h2>Error Breakdown</h2></div>
+        <div class="donut-wrap">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" stroke-width="18"/>
+            <!-- 500 37% -->
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#dc2626" stroke-width="18"
+              stroke-dasharray="92.9 158.7" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+            <!-- 404 26% -->
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#f97316" stroke-width="18"
+              stroke-dasharray="65.3 186.3" stroke-dashoffset="-92.9" transform="rotate(-90 50 50)"/>
+            <!-- DB 20% -->
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#eab308" stroke-width="18"
+              stroke-dasharray="50.3 201.3" stroke-dashoffset="-158.2" transform="rotate(-90 50 50)"/>
+            <!-- Timeout 10% -->
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#6366f1" stroke-width="18"
+              stroke-dasharray="25.1 226.5" stroke-dashoffset="-208.5" transform="rotate(-90 50 50)"/>
+            <!-- Others 7% -->
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#a3a3a3" stroke-width="18"
+              stroke-dasharray="17.6 234" stroke-dashoffset="-233.6" transform="rotate(-90 50 50)"/>
+          </svg>
+          <div class="donut-center"><span class="big">4.3K</span><span class="sub">errors/min</span></div>
+        </div>
+        <div class="legend">
+          <div class="legend-row"><span><span class="legend-dot" style="background:#dc2626;"></span>500 Internal Error</span><strong>37%</strong></div>
+          <div class="legend-row"><span><span class="legend-dot" style="background:#f97316;"></span>404 Not Found</span><strong>26%</strong></div>
+          <div class="legend-row"><span><span class="legend-dot" style="background:#eab308;"></span>DB Connection</span><strong>20%</strong></div>
+          <div class="legend-row"><span><span class="legend-dot" style="background:#6366f1;"></span>Timeout</span><strong>10%</strong></div>
+          <div class="legend-row"><span><span class="legend-dot" style="background:#a3a3a3;"></span>Others</span><strong>7%</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Search & AI Insights -->
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title"><h2>Log Search &amp; Filtering</h2>
+          <span class="pill blue" id="rowCount">Showing 6 logs</span>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="Search logs by message, service, status…">
+          <select id="levelFilter">
+            <option value="">All Levels</option>
+            <option value="ERROR">ERROR</option>
+            <option value="WARN">WARN</option>
+            <option value="INFO">INFO</option>
+            <option value="DEBUG">DEBUG</option>
+          </select>
+          <button onclick="filterLogs()"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        </div>
+        <div class="log-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Service</th>
+                <th>Level</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><h2>AI-Based Log Insights</h2></div>
+
+        <div class="insight-card">
+          <div class="insight-icon high"><i class="fa-solid fa-fire"></i></div>
+          <div class="insight-text">
+            <h4>High Error Rate Detected</h4>
+            <p>500 errors spiked 3× above baseline in the last 10 min on web-server.</p>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon med"><i class="fa-solid fa-database"></i></div>
+          <div class="insight-text">
+            <h4>Database Connection Issues</h4>
+            <p>20% of errors are DB timeouts — possible pool exhaustion on db-primary.</p>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon med"><i class="fa-solid fa-bug"></i></div>
+          <div class="insight-text">
+            <h4>Top Exception: NullPointerException</h4>
+            <p>Recurring in api-service — 312 occurrences in the past hour.</p>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon info"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="insight-text">
+            <h4>Error Spike Trend</h4>
+            <p>Errors correlate with deploy at 12:10 UTC. Consider rollback or hotfix.</p>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon info"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="insight-text">
+            <h4>Anomaly: Unusual 401s</h4>
+            <p>auth-service showing 5× normal 401 rate — possible brute-force attempt.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<script>
+/* ── Sample log data ── */
+const ALL_LOGS = [
+  { ts:"12:16:01", svc:"web-server",   lvl:"ERROR", msg:"500 Internal Server Error" },
+  { ts:"12:15:58", svc:"db-primary",   lvl:"ERROR", msg:"Database connection timeout" },
+  { ts:"12:15:50", svc:"api-service",  lvl:"ERROR", msg:"NullPointerException in UserService" },
+  { ts:"12:15:44", svc:"auth-service", lvl:"WARN",  msg:"High 401 rate — possible brute force" },
+  { ts:"12:15:39", svc:"web-server",   lvl:"WARN",  msg:"Response time > 2000ms on /api/v2/users" },
+  { ts:"12:15:30", svc:"api-service",  lvl:"INFO",  msg:"Deployed version 2.4.1 successfully" },
+  { ts:"12:15:22", svc:"cache",        lvl:"WARN",  msg:"Cache miss rate at 68% — above threshold" },
+  { ts:"12:15:10", svc:"scheduler",    lvl:"INFO",  msg:"Cron job report-gen completed in 3.2s" },
+  { ts:"12:14:55", svc:"web-server",   lvl:"ERROR", msg:"404 Not Found: /api/v1/legacy/endpoint" },
+  { ts:"12:14:40", svc:"auth-service", lvl:"DEBUG", msg:"Token validated for user_id=8842" },
+  { ts:"12:14:28", svc:"db-replica",   lvl:"WARN",  msg:"Replication lag 1.8s — monitor closely" },
+  { ts:"12:14:10", svc:"api-service",  lvl:"INFO",  msg:"Rate limiter: 12 requests throttled" },
+];
+
+function badgeClass(lvl){
+  return {ERROR:"badge-error",WARN:"badge-warn",INFO:"badge-info",DEBUG:"badge-debug"}[lvl]||"badge-info";
+}
+
+function renderTable(rows){
+  const tb = document.getElementById("logTableBody");
+  tb.innerHTML = rows.map(r=>`
+    <tr>
+      <td style="white-space:nowrap;font-family:monospace;font-size:12px;">${r.ts}</td>
+      <td><code style="font-size:12px;color:#6d28d9;">${r.svc}</code></td>
+      <td><span class="badge ${badgeClass(r.lvl)}">${r.lvl}</span></td>
+      <td style="font-size:13px;">${r.msg}</td>
+    </tr>`).join("");
+  document.getElementById("rowCount").textContent = `Showing ${rows.length} logs`;
+}
+
+function filterLogs(){
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  const lv = document.getElementById("levelFilter").value;
+  const res = ALL_LOGS.filter(r=>{
+    const matchQ = !q || r.msg.toLowerCase().includes(q) || r.svc.toLowerCase().includes(q);
+    const matchL = !lv || r.lvl === lv;
+    return matchQ && matchL;
+  });
+  renderTable(res);
+}
+
+document.getElementById("searchInput").addEventListener("input", filterLogs);
+document.getElementById("levelFilter").addEventListener("change", filterLogs);
+renderTable(ALL_LOGS);
+
+/* ── Live SVG line chart ── */
+const svg = document.getElementById("logChart");
+const W=600, H=200, PAD=10;
+let points = Array.from({length:30},()=>Math.random()*120+40);
+
+function makePath(pts){
+  return pts.map((v,i)=>`${i===0?"M":"L"}${PAD+i*(W-PAD*2)/(pts.length-1)},${H-PAD-v}`).join(" ");
+}
+
+function drawChart(){
+  const mx = Math.max(...points);
+  const norm = points.map(v=>v/mx*(H-PAD*2));
+  const fill = `${makePath(norm)} L${W-PAD},${H-PAD} L${PAD},${H-PAD} Z`;
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#8b5cf6" stop-opacity=".35"/>
+        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${fill}" fill="url(#lg)"/>
+    <path d="${makePath(norm)}" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linejoin="round"/>
+  `;
+}
+
+drawChart();
+
+/* Live ticking */
+setInterval(()=>{
+  points.shift();
+  points.push(Math.random()*120+40);
+  drawChart();
+
+  /* Jitter KPIs */
+  const base = 1240000 + Math.round((Math.random()-.5)*20000);
+  document.getElementById("kpiTotal").textContent = (base/1000000).toFixed(2)+"M";
+  document.getElementById("kpiError").textContent = (4200+Math.round(Math.random()*300)).toLocaleString();
+  document.getElementById("kpiWarn").textContent = (12600+Math.round(Math.random()*400)).toLocaleString();
+  document.getElementById("kpiInfo").textContent = ((base-20000)/1000000).toFixed(2)+"M";
+
+  const now = new Date();
+  document.getElementById("lastUpdate").textContent =
+    "Last updated: "+now.toLocaleTimeString();
+}, 2000);
+
+/* Avatar from session */
+const u = sessionStorage.getItem("username")||"Admin";
+document.getElementById("avatarEl").textContent = u[0].toUpperCase();
+</script>
+</body>
+</html>

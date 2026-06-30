@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metrics - Datadog Dashboard</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../shared-dashboard.css">
+</head>
+<body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a class="active" href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main">
+  <header class="topbar"><div><h1>Metrics Explorer</h1><p>CPU, memory, disk, network, host, and service metrics in one view.</p></div><div class="top-actions"><button class="icon-btn"><i class="fa-solid fa-bell"></i></button><div class="avatar" data-user-avatar>A</div></div></header>
+  <section class="content">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">CPU Avg</span><span class="kpi-icon"><i class="fa-solid fa-microchip"></i></span></div><div class="kpi-value">42.6%</div><div class="kpi-sub">Across 24 hosts</div></div>
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">Memory Avg</span><span class="kpi-icon"><i class="fa-solid fa-memory"></i></span></div><div class="kpi-value">68.3%</div><div class="kpi-sub">Healthy range</div></div>
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">Disk Avg</span><span class="kpi-icon"><i class="fa-solid fa-hard-drive"></i></span></div><div class="kpi-value">72.8%</div><div class="kpi-sub">2 warning volumes</div></div>
+      <div class="kpi"><div class="kpi-top"><span class="kpi-label">Network In</span><span class="kpi-icon"><i class="fa-solid fa-network-wired"></i></span></div><div class="kpi-value">125.6</div><div class="kpi-sub">Mbps inbound</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel"><div class="panel-title"><h2>Metric Trend</h2><span class="pill purple">Past 1 Hour</span></div><div class="chart" data-bars="30,42,48,60,72,64,54,50,59,61,55,69,78,52,45"></div></div>
+      <div class="panel"><div class="panel-title"><h2>Resource Saturation</h2></div><div class="metric-row"><span>CPU</span><div class="progress"><div class="fill" style="width:43%"></div></div><strong>43%</strong></div><div class="metric-row"><span>Memory</span><div class="progress"><div class="fill" style="width:68%"></div></div><strong>68%</strong></div><div class="metric-row"><span>Disk</span><div class="progress"><div class="fill" style="width:73%"></div></div><strong>73%</strong></div><div class="metric-row"><span>Network</span><div class="progress"><div class="fill" style="width:58%"></div></div><strong>58%</strong></div></div>
+    </div>
+  </section>
+</main>
+<script src="../shared-dashboard.js"></script>
+</body>
+</html>

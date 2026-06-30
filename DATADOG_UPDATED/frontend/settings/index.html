@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Settings - Datadog Dashboard</title><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"><link rel="stylesheet" href="../shared-dashboard.css"></head><body>
+<script>if(!sessionStorage.getItem("loggedIn"))window.location.href="../login.html";</script>
+<aside class="sidebar">
+  <a class="brand" href="../index.html"><i class="fa-solid fa-database"></i><span>DATADOG</span></a>
+  <nav class="nav">
+    <a href="../index.html"><i class="fa-solid fa-gauge"></i>Overview</a>
+    <a href="../datadog-integration/index.html"><i class="fa-solid fa-plug"></i>Datadog Integration</a>
+    <a href="../metrics/index.html"><i class="fa-solid fa-chart-line"></i>Metrics</a>
+    <a href="../apm/index.html"><i class="fa-solid fa-layer-group"></i>APM</a>
+    <a href="../infrastructure/index.html"><i class="fa-solid fa-server"></i>Infrastructure</a>
+    <a href="../log-analytics/index.html"><i class="fa-solid fa-file-lines"></i>Logs</a>
+    <a href="../realtime-monitoring/index.html"><i class="fa-solid fa-gauge-high"></i>Real-Time Dashboard</a>
+    <a href="../alert-management/index.html"><i class="fa-solid fa-bell"></i>Alerts</a>
+    <a href="../monitors/index.html"><i class="fa-solid fa-display"></i>Monitors</a>
+    <a href="../dashboards/index.html"><i class="fa-solid fa-table-columns"></i>Dashboards</a>
+    <a href="../integrations/index.html"><i class="fa-solid fa-puzzle-piece"></i>Integrations</a>
+    <a href="../reports/index.html"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+    <a href="../ai-observability/index.html"><i class="fa-solid fa-robot"></i>AI Observability</a>
+    <a class="active" href="../settings/index.html"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="status-box">
+    <h3>Datadog Status</h3>
+    <div class="status-ok"><span class="status-dot"></span>All Systems Operational</div>
+    <p>datadoghq.com · dd_api_••••••</p>
+  </div>
+</aside>
+<main class="main"><header class="topbar"><div><h1>Settings</h1><p>Manage API credentials, roles, notification routing, and platform preferences.</p></div><div class="top-actions"><button class="primary-btn">Save Changes</button><div class="avatar" data-user-avatar>A</div></div></header><section class="content">
+<div class="grid-2"><div class="panel"><div class="panel-title"><h2>Datadog API</h2><span class="pill green">Connected</span></div><div class="form-grid"><div><label>Site</label><select><option>datadoghq.com</option><option>datadoghq.eu</option></select></div><div><label>API Key</label><input type="password" value="dd_api_************"></div><div><label>Application Key</label><input type="password" value="dd_app_************"></div><div><label>Refresh Interval</label><select><option>30 seconds</option><option>1 minute</option><option>5 minutes</option></select></div></div></div><div class="panel"><div class="panel-title"><h2>Access Control</h2></div><table><thead><tr><th>Role</th><th>Users</th><th>Access</th></tr></thead><tbody><tr><td>Admin</td><td>1</td><td><span class="pill purple">Full</span></td></tr><tr><td>DevOps</td><td>2</td><td><span class="pill blue">Operate</span></td></tr><tr><td>User</td><td>1</td><td><span class="pill green">Read-only</span></td></tr></tbody></table></div></div>
+<div class="panel"><div class="panel-title"><h2>Notification Routing</h2></div><div class="form-grid"><div><label>Critical alerts</label><input value="#incident-response"></div><div><label>Warning alerts</label><input value="#ops-alerts"></div><div><label>Reports</label><input value="admin@datadog.com"></div><div><label>Quiet Hours</label><input value="22:00 - 06:00"></div></div></div>
+</section></main><script src="../shared-dashboard.js"></script></body></html>
